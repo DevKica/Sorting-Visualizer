@@ -2,6 +2,14 @@
 @tailwind components;
 @tailwind utilities;
 
+.main-btn {
+  @apply bg-blue-300 p-1 sm:p-2 border-2 border-black flex flex-col;
+}
+
+.single-bar {
+  @apply border border-gray-900 bg-gray-400 text-center;
+}
+
 body {
   margin: 0;
   word-break: break-word;
