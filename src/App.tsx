@@ -1,84 +1,91 @@
-import { useState, useEffect } from "react";
 import sleep from "./utils/sleep";
-import { COMPARE, SORTED, SWAP } from "./@types/main";
-import bubbleSort from "./sortingAlgorithms/bubbleSort";
+import sortingAlgorithms from "./sortingAlgorithms";
 import SortingVisualizer from "./components/SortingVisualizer";
+import { useState, useEffect } from "react";
+import { COMPARE, SORTED, sortingFunction, SWAP } from "./@types/main";
+import { getAllArrayBars, handleResetColors } from "./utils/arrays";
+import { compareColor, defaultBarColor, sortedColor, swapColor } from "./utils/animationColors";
 
 const maxLen = 100;
 const max = 100;
 const min = 5;
 
 const App = () => {
-  const [array, setArray] = useState<number[]>([]);
-  const [arrayLen, setArrayLen] = useState<number>(10);
+  const [arr, setArr] = useState<number[]>([]);
+  const [len, setLen] = useState<number>(10);
   const [ongoing, setOngoing] = useState<boolean>(false);
+
   const [showNumbers, setShowNumbers] = useState<boolean>(true);
-  const [animationTime, setAnimationTime] = useState<number>(70);
+  const [animationTime, setAnimationTime] = useState<number>(10);
 
-  const handleResetArray = () => {
-    let actualLen = arrayLen;
-    if (arrayLen > maxLen) actualLen = maxLen;
-    const newArray = Array.from({ length: actualLen }, () => Math.floor(Math.random() * (max - min)) + min);
-
-    setOngoing(false);
-    setArrayLen(actualLen);
-    setArray(newArray);
+  const animationSleep = async () => {
+    await sleep(animationTime);
   };
 
-  const handleBubbleSort = async () => {
-    const { result, animations } = bubbleSort(array);
+  const handleResetArray = () => {
+    let actualLen = len;
+    if (len > maxLen) actualLen = maxLen;
+    const newArray = Array.from({ length: actualLen }, () => Math.floor(Math.random() * (max - min)) + min);
+
+    setArr(newArray);
+    setLen(actualLen);
+    setOngoing(false);
+
+    handleResetColors();
+  };
+
+  const handleSort = async (fn: sortingFunction) => {
+    handleResetColors();
+
+    const { result, animations } = fn(arr);
 
     for (let i = 0; i < animations.length; i++) {
       const animation = animations[i];
-      const bars = document.getElementsByClassName("single-bar");
+      const bars = getAllArrayBars();
 
-      const operation = animation[0];
+      const opr = animation[0];
       //@ts-ignore
-      const el1 = bars[animation[1]];
-
-      if (operation === SORTED) {
-        el1.style.backgroundColor = "green";
-        continue;
-      }
-
+      const bar1 = bars[animation[1]];
       //@ts-ignore
-      const el2 = bars[animation[2]];
+      const bar2 = bars[animation[2]];
 
-      if (operation === COMPARE) {
-        el1.style.backgroundColor = "red";
-        el2.style.backgroundColor = "red";
-      } else if (operation === "SWAP") {
-        el1.style.backgroundColor = "blue";
-        el2.style.backgroundColor = "blue";
+      switch (opr) {
+        case COMPARE:
+          bar1.style.backgroundColor = bar2.style.backgroundColor = compareColor;
+          break;
+        case SWAP:
+          bar1.style.backgroundColor = bar2.style.backgroundColor = swapColor;
+          break;
+        case SORTED:
+          bar1.style.backgroundColor = sortedColor;
+          continue;
+        default:
+          break;
       }
 
-      await sleep(animationTime);
+      await animationSleep();
 
-      if (operation === SWAP) {
-        const { height: height1 } = el1.getBoundingClientRect();
-        const { height: height2 } = el2.getBoundingClientRect();
+      if (opr === SWAP) {
+        const { height: height1 } = bar1.getBoundingClientRect();
+        const { height: height2 } = bar2.getBoundingClientRect();
 
-        el1.style.height = `${height2}px`;
-        el2.style.height = `${height1}px`;
+        bar1.style.height = `${height2}px`;
+        bar2.style.height = `${height1}px`;
 
-        let temp = el1.innerHTML;
-        el1.innerHTML = el2.innerHTML;
-        el2.innerHTML = temp;
+        let temp = bar1.innerHTML;
+        bar1.innerHTML = bar2.innerHTML;
+        bar2.innerHTML = temp;
       }
-
-      await sleep(animationTime);
-
-      el1.style.backgroundColor = "#9CA3AF";
-      el2.style.backgroundColor = "#9CA3AF";
-
-      await sleep(animationTime);
+      await animationSleep();
+      bar1.style.backgroundColor = bar2.style.backgroundColor = defaultBarColor;
+      await animationSleep();
     }
-    setArray(result);
+    setArr(result);
   };
 
   useEffect(() => {
     handleResetArray();
-  }, [arrayLen]);
+  }, [len]);
 
   return (
     <div className="max-h-screen h-screen w-full overflow-x-hidden flex flex-col relative p-2">
@@ -89,31 +96,34 @@ const App = () => {
         <button className="main-btn" onClick={() => setShowNumbers(!showNumbers)}>
           {showNumbers ? "Hide" : "Show"} numbers
         </button>
-        <button
-          onClick={async () => {
-            await handleBubbleSort();
-          }}
-          className="main-btn"
-        >
-          Bubble
-        </button>
+        {sortingAlgorithms.map((e, key) => (
+          <button
+            key={key}
+            onClick={async () => {
+              await handleSort(e.fn);
+            }}
+            className="main-btn"
+          >
+            {e.name}
+          </button>
+        ))}
         <div className="main-btn">
           <span>Animation time - {animationTime}ms</span>
           <input
             type="range"
-            min="0.1"
+            min="0.01"
             max="1000"
-            step="0.1"
+            step="0.01"
             value={animationTime}
             onChange={(e: any) => setAnimationTime(e.target.value)}
           />
         </div>
         <div className="main-btn">
-          <span>Array length - {arrayLen}</span>
-          <input type="range" min="2" max="100" value={arrayLen} onChange={(e: any) => setArrayLen(e.target.value)} />
+          <span>Array length - {len}</span>
+          <input type="range" min="2" max="100" value={len} onChange={(e: any) => setLen(e.target.value)} />
         </div>
       </header>
-      <SortingVisualizer array={array} max={max} showNumbers={showNumbers} />
+      <SortingVisualizer array={arr} max={max} showNumbers={showNumbers} />
       <footer className="mt-auto">footer</footer>
     </div>
   );

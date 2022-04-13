@@ -7,7 +7,7 @@
 }
 
 .single-bar {
-  @apply border border-gray-900 bg-gray-400 text-center;
+  @apply border border-gray-900 text-center;
 }
 
 body {

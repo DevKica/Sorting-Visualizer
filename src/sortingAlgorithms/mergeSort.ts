@@ -1,7 +1,5 @@
-import { animationsType } from "../@types/main";
-
-function mergeSort(array: number[], animations: animationsType) {
-  return array;
+function mergeSort(arr: number[]) {
+  return { result: arr, animations: [] };
   // if (array.length === 1) return { array, animations };
   // const mid = Math.floor(array.length / 2);
   // const {array:first} = mergeSort(array.slice(0, mid), animations);

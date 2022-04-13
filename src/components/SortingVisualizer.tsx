@@ -1,3 +1,6 @@
+import { defaultBarColor } from "../utils/animationColors";
+import { singleBarClassName } from "../utils/arrays";
+
 const SortingVisualizer = ({ array, max, showNumbers }: { array: number[]; max: number; showNumbers: boolean }) => {
   return (
     <main className="my-1 sm:my-2 h-full relative">
@@ -5,8 +8,8 @@ const SortingVisualizer = ({ array, max, showNumbers }: { array: number[]; max: 
         {array.map((e, idx) => (
           <div
             key={idx}
-            className="single-bar"
-            style={{ width: `${100 / array.length}%`, height: `${(90 / max) * e}%` }}
+            className={singleBarClassName}
+            style={{ width: `${100 / array.length}%`, height: `${(90 / max) * e}%`, backgroundColor: defaultBarColor }}
           >
             {showNumbers && e}
           </div>
