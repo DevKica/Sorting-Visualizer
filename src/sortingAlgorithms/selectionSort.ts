@@ -9,15 +9,15 @@ function selectionSort(arr: number[]) {
     let min_idx = i;
 
     for (let j = i + 1; j < result.length; j++) {
-      animations.push([COMPARE, min_idx, j]);
+      animations.push({ opr: COMPARE, idxs: [min_idx, j] });
       if (result[min_idx] > result[j]) {
         min_idx = j;
       }
     }
     swap(result, i, min_idx);
-    if (i !== min_idx) animations.push([SWAP, i, min_idx]);
+    if (i !== min_idx) animations.push({ opr: SWAP, idxs: [i, min_idx] });
 
-    animations.push([SORTED, i]);
+    animations.push({ opr: SORTED, idxs: [i] });
   }
   return { result, animations };
 }

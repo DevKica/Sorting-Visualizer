@@ -2,9 +2,9 @@ import sleep from "./utils/sleep";
 import sortingAlgorithms from "./sortingAlgorithms";
 import SortingVisualizer from "./components/SortingVisualizer";
 import { useState, useEffect } from "react";
-import { COMPARE, SORTED, sortingFunction, SWAP } from "./@types/main";
+import { animationsType, COMPARE, SHIFT, SORTED, sortingFunction, SWAP } from "./@types/main";
 import { getAllArrayBars, handleResetColors } from "./utils/arrays";
-import { compareColor, defaultBarColor, sortedColor, swapColor } from "./utils/animationColors";
+import { compareColor, defaultBarColor, shiftColor, sortedColor, swapColor } from "./utils/animationColors";
 
 const maxLen = 100;
 const max = 100;
@@ -16,7 +16,7 @@ const App = () => {
   const [ongoing, setOngoing] = useState<boolean>(false);
 
   const [showNumbers, setShowNumbers] = useState<boolean>(true);
-  const [animationTime, setAnimationTime] = useState<number>(10);
+  const [animationTime, setAnimationTime] = useState<number>(100);
 
   const animationSleep = async () => {
     await sleep(animationTime);
@@ -24,7 +24,7 @@ const App = () => {
 
   const handleResetArray = () => {
     let actualLen = len;
-    if (len > maxLen) actualLen = maxLen;
+    if (actualLen > maxLen) actualLen = maxLen;
     const newArray = Array.from({ length: actualLen }, () => Math.floor(Math.random() * (max - min)) + min);
 
     setArr(newArray);
@@ -36,18 +36,20 @@ const App = () => {
 
   const handleSort = async (fn: sortingFunction) => {
     handleResetColors();
+    let result;
+    let animations: animationsType = [];
 
-    const { result, animations } = fn(arr);
+    ({ result, animations } = fn(arr));
 
     for (let i = 0; i < animations.length; i++) {
-      const animation = animations[i];
       const bars = getAllArrayBars();
+      const animation = animations[i];
 
-      const opr = animation[0];
-      //@ts-ignore
-      const bar1 = bars[animation[1]];
-      //@ts-ignore
-      const bar2 = bars[animation[2]];
+      const { opr } = animation;
+      const idx1 = animation.idxs[0];
+      const bar1: any = bars[idx1];
+      const idx2 = animation.idxs[1];
+      const bar2: any = bars[idx2];
 
       switch (opr) {
         case COMPARE:
@@ -56,14 +58,40 @@ const App = () => {
         case SWAP:
           bar1.style.backgroundColor = bar2.style.backgroundColor = swapColor;
           break;
+        case SHIFT:
+          bar1.style.backgroundColor = shiftColor;
+          break;
         case SORTED:
           bar1.style.backgroundColor = sortedColor;
           continue;
         default:
           break;
       }
-
       await animationSleep();
+
+      if (opr === SHIFT) {
+        const shiftBar: any = bars[idx2];
+        const { height: shiftBarHeight } = shiftBar.getBoundingClientRect();
+        const shiftBarContent = shiftBar.innerHTML;
+
+        shiftBar.style.backgroundColor = shiftColor;
+        let s_idx = idx2;
+
+        while (s_idx !== idx1) {
+          const currentBar: any = bars[s_idx];
+          const previousBar: any = bars[s_idx - 1];
+
+          currentBar.style.height = `${previousBar.getBoundingClientRect().height}px`;
+          currentBar.innerHTML = previousBar.innerHTML;
+
+          s_idx--;
+        }
+        await animationSleep();
+
+        //@ts-ignore
+        bars[idx1].style.height = `${shiftBarHeight}px`;
+        bars[idx1].innerHTML = shiftBarContent;
+      }
 
       if (opr === SWAP) {
         const { height: height1 } = bar1.getBoundingClientRect();
@@ -111,7 +139,7 @@ const App = () => {
           <span>Animation time - {animationTime}ms</span>
           <input
             type="range"
-            min="0.01"
+            min="0"
             max="1000"
             step="0.01"
             value={animationTime}
