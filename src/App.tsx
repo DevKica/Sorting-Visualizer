@@ -15,8 +15,8 @@ const App = () => {
   const [len, setLen] = useState<number>(10);
   const [ongoing, setOngoing] = useState<boolean>(false);
 
-  const [showNumbers, setShowNumbers] = useState<boolean>(true);
-  const [animationTime, setAnimationTime] = useState<number>(100);
+  const [showNumbers, setShowNumbers] = useState<boolean>(false);
+  const [animationTime, setAnimationTime] = useState<number>(0);
 
   const animationSleep = async () => {
     await sleep(animationTime);
@@ -38,6 +38,7 @@ const App = () => {
     handleResetColors();
     let result;
     let animations: animationsType = [];
+    setOngoing(true);
 
     ({ result, animations } = fn(arr));
 
@@ -83,7 +84,6 @@ const App = () => {
 
           currentBar.style.height = `${previousBar.getBoundingClientRect().height}px`;
           currentBar.innerHTML = previousBar.innerHTML;
-
           s_idx--;
         }
         await animationSleep();
@@ -108,6 +108,7 @@ const App = () => {
       bar1.style.backgroundColor = bar2.style.backgroundColor = defaultBarColor;
       await animationSleep();
     }
+    setOngoing(false);
     setArr(result);
   };
 
@@ -118,7 +119,7 @@ const App = () => {
   return (
     <div className="max-h-screen h-screen w-full overflow-x-hidden flex flex-col relative p-2">
       <header className="flex flex-row justify-center flex-wrap gap-1">
-        <button onClick={handleResetArray} className="main-btn">
+        <button onClick={handleResetArray} disabled={ongoing} className={`main-btn ${ongoing ? "disabled-btn" : ""}`}>
           New array
         </button>
         <button className="main-btn" onClick={() => setShowNumbers(!showNumbers)}>
@@ -126,18 +127,20 @@ const App = () => {
         </button>
         {sortingAlgorithms.map((e, key) => (
           <button
+            disabled={ongoing}
             key={key}
             onClick={async () => {
               await handleSort(e.fn);
             }}
-            className="main-btn"
+            className={`main-btn ${ongoing ? "disabled-btn" : ""}`}
           >
             {e.name}
           </button>
         ))}
-        <div className="main-btn">
+        <div className={`main-btn ${ongoing ? "disabled-btn" : ""}`}>
           <span>Animation time - {animationTime}ms</span>
           <input
+            disabled={ongoing}
             type="range"
             min="0"
             max="1000"
@@ -146,9 +149,16 @@ const App = () => {
             onChange={(e: any) => setAnimationTime(e.target.value)}
           />
         </div>
-        <div className="main-btn">
+        <div className={`main-btn ${ongoing ? "disabled-btn" : ""}`}>
           <span>Array length - {len}</span>
-          <input type="range" min="2" max="100" value={len} onChange={(e: any) => setLen(e.target.value)} />
+          <input
+            disabled={ongoing}
+            type="range"
+            min="2"
+            max="100"
+            value={len}
+            onChange={(e: any) => setLen(e.target.value)}
+          />
         </div>
       </header>
       <SortingVisualizer array={arr} max={max} showNumbers={showNumbers} />
