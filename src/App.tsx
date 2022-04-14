@@ -162,7 +162,7 @@ const App = () => {
         </div>
       </header>
       <SortingVisualizer array={arr} max={max} showNumbers={showNumbers} />
-      <footer className="mt-auto">footer</footer>
+      <footer className="mt-auto"></footer>
     </div>
   );
 };

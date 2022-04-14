@@ -3,6 +3,7 @@ import bubbleSort from "./bubbleSort";
 import heapSort from "./heapSort";
 import insertionSort from "./insertionSort";
 import mergeFunction from "./mergeSort";
+import quickSort from "./quickSort";
 import selectionSort from "./selectionSort";
 
 const sortingAlgorithms: { name: string; fn: sortingFunction }[] = [
@@ -11,6 +12,7 @@ const sortingAlgorithms: { name: string; fn: sortingFunction }[] = [
   { name: "Insertion", fn: insertionSort },
   { name: "Merge", fn: mergeFunction },
   { name: "Heap", fn: heapSort },
+  { name: "Quick", fn: quickSort },
 ];
 
 export default sortingAlgorithms;
