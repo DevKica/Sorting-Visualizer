@@ -1,14 +1,11 @@
+import { useState, useEffect } from "react";
 import sleep from "./utils/sleep";
 import sortingAlgorithms from "./sortingAlgorithms";
 import SortingVisualizer from "./components/SortingVisualizer";
-import { useState, useEffect } from "react";
+import { MAX_LEN, MAX_RANGE, MIN_RANGE } from "./utils/constants";
 import { animationsType, COMPARE, SHIFT, SORTED, sortingFunction, SWAP } from "./@types/main";
-import { getAllArrayBars, handleResetColors } from "./utils/arrays";
 import { compareColor, defaultBarColor, shiftColor, sortedColor, swapColor } from "./utils/animationColors";
-
-const maxLen = 100;
-const max = 100;
-const min = 5;
+import { handleResetColors, getAllArrayBars } from "./utils/arrays";
 
 const App = () => {
   const [arr, setArr] = useState<number[]>([]);
@@ -24,13 +21,14 @@ const App = () => {
 
   const handleResetArray = () => {
     let actualLen = len;
-    if (actualLen > maxLen) actualLen = maxLen;
-    const newArray = Array.from({ length: actualLen }, () => Math.floor(Math.random() * (max - min)) + min);
+    if (actualLen > MAX_LEN) actualLen = MAX_LEN;
+    const newArray = Array.from(
+      { length: actualLen },
+      () => Math.floor(Math.random() * (MAX_RANGE - MIN_RANGE)) + MIN_RANGE
+    );
 
     setArr(newArray);
     setLen(actualLen);
-    setOngoing(false);
-
     handleResetColors();
   };
 
@@ -108,6 +106,7 @@ const App = () => {
       bar1.style.backgroundColor = bar2.style.backgroundColor = defaultBarColor;
       await animationSleep();
     }
+
     setOngoing(false);
     setArr(result);
   };
@@ -119,10 +118,13 @@ const App = () => {
   return (
     <div className="max-h-screen h-screen w-full overflow-x-hidden flex flex-col relative p-2">
       <header className="flex flex-row justify-center flex-wrap gap-1">
-        <button onClick={handleResetArray} disabled={ongoing} className={`main-btn ${ongoing ? "disabled-btn" : ""}`}>
+        <button onClick={() => setOngoing(false)} disabled={!ongoing} className="main-btn">
+          Stop
+        </button>
+        <button onClick={handleResetArray} disabled={ongoing} className="main-btn">
           New array
         </button>
-        <button className="main-btn" onClick={() => setShowNumbers(!showNumbers)}>
+        <button className="main-btn" disabled={ongoing} onClick={() => setShowNumbers(!showNumbers)}>
           {showNumbers ? "Hide" : "Show"} numbers
         </button>
         {sortingAlgorithms.map((e, key) => (
@@ -132,7 +134,7 @@ const App = () => {
             onClick={async () => {
               await handleSort(e.fn);
             }}
-            className={`main-btn ${ongoing ? "disabled-btn" : ""}`}
+            className="main-btn"
           >
             {e.name}
           </button>
@@ -161,8 +163,8 @@ const App = () => {
           />
         </div>
       </header>
-      <SortingVisualizer array={arr} max={max} showNumbers={showNumbers} />
-      <footer className="mt-auto"></footer>
+      <SortingVisualizer array={arr} max={MAX_RANGE} showNumbers={showNumbers} />
+      {/* <footer className="mt-auto"></footer> */}
     </div>
   );
 };
