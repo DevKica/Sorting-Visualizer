@@ -118,9 +118,6 @@ const App = () => {
   return (
     <div className="max-h-screen h-screen w-full overflow-x-hidden flex flex-col relative p-2">
       <header className="flex flex-row justify-center flex-wrap gap-1">
-        <button onClick={() => setOngoing(false)} disabled={!ongoing} className="main-btn">
-          Stop
-        </button>
         <button onClick={handleResetArray} disabled={ongoing} className="main-btn">
           New array
         </button>
