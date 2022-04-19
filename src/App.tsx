@@ -113,6 +113,7 @@ const App = () => {
 
   useEffect(() => {
     handleResetArray();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [len]);
 
   return (
