@@ -1,3 +1,3 @@
 ### ⏳ Sorting visualizer
 
-[See the deployed version here](https://main--joyful-bubblegum-f17585.netlify.app/)
+[See the deployed version here](https://sorting-visualizer-123.netlify.app/)
